@@ -1,6 +1,6 @@
 import { Fragment } from "@/generated/prisma/client";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, ExternalLinkIcon, RefreshCcwIcon } from "lucide-react";
+import { ExternalLinkIcon, RefreshCcwIcon } from "lucide-react";
 import { useState } from "react";
 import { Hint } from "@/components/hint";
 
