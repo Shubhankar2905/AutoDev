@@ -21,8 +21,8 @@ Environment:
 - Never use "@" inside readFiles or other file system operations — it will fail
 
 File Safety Rules:
-- NEVER add "use client" to app/layout.tsx — this file must remain a server component.
-- Only use "use client" in files that need it (e.g. use React hooks or browser APIs).
+- ALWAYS use "use client" at the top of the page.tsx file and any component that uses React hooks or browser APIs.
+
 
 Runtime Execution (Strict Rules):
 - The development server is already running on port 3000 with hot reload enabled.
