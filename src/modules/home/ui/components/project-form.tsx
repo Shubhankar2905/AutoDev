@@ -25,17 +25,18 @@ export const ProjectForm = () => {
   const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
   const createProject = useMutation(
     trpc.projects.create.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries(trpc.projects.getMany.queryOptions());
         router.push(`/projects/${data.id}`);
-        //TODO:Invaldiate Usage
       },
 
       onError: (error) => {
-        //TODO to pricing
-        toast.error(error.message);
+        toast.error(
+          error.message === "Invalid prompt" ? "Invalid prompt" : error.message,
+        );
       },
     }),
   );
@@ -49,6 +50,7 @@ export const ProjectForm = () => {
 
   const [isFocused, setIsFocused] = useState(false);
   const isPending = createProject.isPending;
+
   const isButtonDisabled = isPending || !form.formState.isValid;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -72,7 +74,7 @@ export const ProjectForm = () => {
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className={cn(
-            "relative border p-4 pt-1 rounded-xl bg-sidebar dakr:bg-sidebar transition-all",
+            "relative border p-4 pt-1 rounded-xl bg-sidebar dark:bg-sidebar transition-all",
             isFocused && "shadow-xs",
           )}
         >

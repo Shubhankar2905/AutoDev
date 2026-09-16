@@ -4,7 +4,7 @@ import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { z } from "zod";
 import {generateSlug} from "random-word-slugs"
 import { TRPCError } from "@trpc/server";
-
+import { INVALID_PROMPT_MESSAGE, validatePrompt } from "@/lib/prompt-validator";
 
 export const projectsRouter = createTRPCRouter({
     getOne: baseProcedure
@@ -37,14 +37,19 @@ export const projectsRouter = createTRPCRouter({
   create: baseProcedure
     .input(
       z.object({
-        value: z.string().min(1, { message: "prompt is required" }).max(10000, { message: "Prompt is too long" }),
+        value: z.string().min(1, { message: "Prompt is required" }).max(10000, { message: "Prompt is too long" }),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const validation = await validatePrompt(input.value);
+      if (!validation.valid) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: INVALID_PROMPT_MESSAGE });
+      }
 
       const createdProject = await prisma.project.create({
         data: {
           name: generateSlug(2,{format:"kebab"}),
+          userId: ctx.userId,
           messages: {create:{
               content: input.value,
               role: "USER",

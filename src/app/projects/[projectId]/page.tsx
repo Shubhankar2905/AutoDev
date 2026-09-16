@@ -12,9 +12,10 @@ interface Props {
 const page = async ({ params }: Props) => {
   const { projectId } = await params;
 
-  const queryClient = getQueryClient();
+  const queryClient = getQueryClient(); // cached data is stored here
 
   void queryClient.prefetchQuery(
+    //fetches data before the component renders and store in queryClient for hydration
     trpc.messages.getMany.queryOptions({
       projectId: projectId,
     }),
@@ -27,6 +28,8 @@ const page = async ({ params }: Props) => {
   );
 
   return (
+    //dehydrate() means taking the data stored in the server-side React Query cache and
+    //converting it into a transferable state that can be sent to the client.
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<p>Loading....</p>}>
         <ProjectView projectId={projectId} />
@@ -36,3 +39,5 @@ const page = async ({ params }: Props) => {
 };
 
 export default page;
+
+//getqueryclient prefetch query dehydrate hydrationboundary suspense

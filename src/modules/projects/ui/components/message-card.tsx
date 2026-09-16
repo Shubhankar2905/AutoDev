@@ -86,7 +86,7 @@ const AssistantMessageCard = ({
           height={18}
           className="shrink-0"
         />
-        <span className="text-sm font-medium">Vibe</span>
+        <span className="text-sm font-medium">AutoDev</span>
         <span className="text-xs font-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
           {format(createdAt, "HH:mm 'on' MMM dd, yyyy")}
         </span>
