@@ -2,6 +2,8 @@ import { inngest } from "@/inngest/client";
 import {prisma} from "@/lib/prisma";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { INVALID_PROMPT_MESSAGE, validatePrompt } from "@/lib/prompt-validator";
 
 export const messagesRouter = createTRPCRouter({
 
@@ -33,6 +35,11 @@ export const messagesRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
+      const validation = await validatePrompt(input.value);
+      if (!validation.valid) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: INVALID_PROMPT_MESSAGE });
+      }
+
       const createdmessage = await prisma.message.create({
         data: {
           projectId: input.projectId,

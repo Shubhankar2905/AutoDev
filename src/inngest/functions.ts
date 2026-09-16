@@ -5,6 +5,7 @@ import { getSandboxURL, lastAssistantTextMessageContent, parseAgentResponse } fr
 import z from "zod";
 import { FRAGMENT_TITLE_PROMPT, PROMPT,RESPONSE_PROMPT } from "@/prompt";
 import { prisma } from "@/lib/prisma";
+import { INVALID_PROMPT_MESSAGE, validatePrompt } from "@/lib/prompt-validator";
 
 interface AgentState {
   summary:string;
@@ -22,6 +23,7 @@ const deepseekModel = openai({
 
 
 
+
 export const codeAgentFunction = inngest.createFunction(
   {
     id: "code-agent",
@@ -32,6 +34,14 @@ export const codeAgentFunction = inngest.createFunction(
     ],
   },
   async ({ event, step }) => {
+    const validation = await step.run("validate-prompt", async () => {
+      return validatePrompt(event.data.value);
+    });
+
+    if (!validation.valid) {
+      return { valid: false, error: INVALID_PROMPT_MESSAGE };
+    }
+
     const sandboxId = await step.run("get-sandbox-id", async () => {
       const sandbox = await Sandbox.create("vibe-nextjs-shubh-2");
       return sandbox.sandboxId;
@@ -72,6 +82,11 @@ export const codeAgentFunction = inngest.createFunction(
       system:
         PROMPT,
       model: deepseekModel,
+      // model: gemini({
+      //   model: "gemini-2.5-flash", 
+      //   apiKey: process.env.GEMINI_API_KEY
+        
+      // }),
       tools: [
         createTool({
           name: "terminal",
@@ -198,12 +213,18 @@ export const codeAgentFunction = inngest.createFunction(
     const fragmentTitleGenerator = createAgent({
       name:"fragment-title-generator",
       system:FRAGMENT_TITLE_PROMPT,
-      model:deepseekModel,
+       model:gemini({
+        model: "gemini-2.5-flash", 
+        apiKey: process.env.GEMINI_API_KEY
+      }),
     })
     const ResponseGenerator = createAgent({
       name:"response-generator",
       system:RESPONSE_PROMPT,
-      model:deepseekModel,
+      model:gemini({
+        model: "gemini-2.5-flash", 
+        apiKey: process.env.GEMINI_API_KEY
+      }),
 
     })
 

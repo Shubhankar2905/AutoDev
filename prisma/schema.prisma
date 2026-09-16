@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -14,12 +8,35 @@ datasource db {
 }
 
 model Project {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+}
 
-  messages Message[]
+model Message {
+  id        String      @id @default(uuid())
+  content   String
+  role      MessageRole
+  type      MessageType
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  projectId String
+  fragment  Fragment?
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Fragment {
+  id         String   @id @default(uuid())
+  messageId  String   @unique
+  sandboxUrl String
+  title      String
+  files      Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
 
 enum MessageRole {
@@ -30,29 +47,4 @@ enum MessageRole {
 enum MessageType {
   RESULT
   ERROR
-}
-
-model Message {
-  id        String      @id @default(uuid())
-  content   String
-  role      MessageRole
-  type      MessageType
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  projectId String
-  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  fragment  Fragment?
-}
-
-model Fragment {
-  id         String  @id @default(uuid())
-  messageId  String  @unique
-  message    Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  sandboxUrl String
-  title      String
-  files      Json
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

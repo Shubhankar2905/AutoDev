@@ -38,7 +38,9 @@ export const MessageForm = ({ projectId }: Props) => {
 
       onError: (error) => {
         //TODO to pricing
-        toast.error(error.message);
+        toast.error(
+          error.message === "Invalid prompt" ? "Invalid prompt" : error.message,
+        );
       },
     }),
   );
