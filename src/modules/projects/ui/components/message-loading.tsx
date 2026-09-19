@@ -3,15 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const ShimmerMessage = () => {
-  const messages = [
-    "Thinking...",
-    "Loading...",
-    "Generating response...",
-    "Analyzing request...",
-    "Building your website...",
-    "Adding final touches...",
-    "Almost there...",
-  ];
+  const messages = ["Generating response..."];
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   useEffect(() => {

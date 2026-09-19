@@ -13,13 +13,27 @@ interface AgentState {
 
 }
 
+// const deepseekModel = openai({
+
+//   model: "deepseek/deepseek-chat",
+//   apiKey: process.env.OPENROUTER_API_KEY,
+//   baseUrl: "https://openrouter.ai/api/v1",
+
+// });
+
 const deepseekModel = openai({
 
-  model: "deepseek/deepseek-chat",
+  model: "deepseek/deepseek-v4-flash",
   apiKey: process.env.OPENROUTER_API_KEY,
   baseUrl: "https://openrouter.ai/api/v1",
+})
+// const deepseekModel = openai({
 
-});
+//   model: "openai/gpt-oss-120b",
+//   apiKey: process.env.OPENROUTER_API_KEY,
+//   baseUrl: "https://openrouter.ai/api/v1",
+
+// });
 
 
 
@@ -204,27 +218,29 @@ export const codeAgentFunction = inngest.createFunction(
         return codeagent;
       }
     })
-    const { output } = await codeagent.run(
-      `write the following code snippet: ${event.data.value}`
-    );
+    // const { output } = await codeagent.run(
+    //   `write the following code snippet: ${event.data.value}`
+    // );
 
     const result = await network.run(event.data.value,{state});
 
     const fragmentTitleGenerator = createAgent({
       name:"fragment-title-generator",
       system:FRAGMENT_TITLE_PROMPT,
-       model:gemini({
-        model: "gemini-2.5-flash", 
-        apiKey: process.env.GEMINI_API_KEY
-      }),
+      model: deepseekModel
+      //  model:gemini({
+      //   model: "gemini-2.5-flash", 
+      //   apiKey: process.env.GEMINI_API_KEY
+      // }),
     })
     const ResponseGenerator = createAgent({
       name:"response-generator",
       system:RESPONSE_PROMPT,
-      model:gemini({
-        model: "gemini-2.5-flash", 
-        apiKey: process.env.GEMINI_API_KEY
-      }),
+      model:deepseekModel
+      // model:gemini({
+      //   model: "gemini-2.5-flash", 
+      //   apiKey: process.env.GEMINI_API_KEY
+      // }),
 
     })
 
