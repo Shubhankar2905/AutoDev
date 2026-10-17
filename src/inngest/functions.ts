@@ -27,6 +27,13 @@ const deepseekModel = openai({
   apiKey: process.env.OPENROUTER_API_KEY,
   baseUrl: "https://openrouter.ai/api/v1",
 })
+
+const openaiModel = openai({
+
+  model: "openai/gpt-6-luna",
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseUrl: "https://openrouter.ai/api/v1",
+})
 // const deepseekModel = openai({
 
 //   model: "openai/gpt-oss-120b",
@@ -95,7 +102,7 @@ export const codeAgentFunction = inngest.createFunction(
       name: "code-agent",
       system:
         PROMPT,
-      model: deepseekModel,
+      model: openaiModel,
       // model: gemini({
       //   model: "gemini-2.5-flash", 
       //   apiKey: process.env.GEMINI_API_KEY
@@ -109,6 +116,14 @@ export const codeAgentFunction = inngest.createFunction(
             command: z.string(),
           }),
           handler: async ({ command }, { step }) => {
+            if (
+              /\b(curl|wget|invoke-webrequest|invoke-restmethod|lynx|w3m)\b/i.test(
+                command
+              )
+            ) {
+              return "Web search and external content fetching are not allowed. Use known Unsplash image URLs directly in the generated website.";
+            }
+
             return await step?.run("terminal", async () => {
               const buffers = { stdout: "", stderr: "" };
               try {

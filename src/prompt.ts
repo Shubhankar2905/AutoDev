@@ -98,9 +98,10 @@ Additional Guidelines:
 - Always import each Shadcn component directly from its correct path (e.g. @/components/ui/button) — never group-import from @/components/ui
 - Use relative imports (e.g., "./weather-card") for your own components in app/
 - Follow React best practices: semantic HTML, ARIA where needed, clean useState/useEffect usage
-- Use only static/local data (no external APIs)
+- Use only static/local data for content and behavior; image assets are the one exception described below
 - Responsive and accessible by default
-- Do not use local or external image URLs — instead rely on emojis and divs with proper aspect ratios (aspect-video, aspect-square, etc.) and color placeholders (e.g. bg-gray-200)
+- Images are required in every generated website whenever the design has a visual area such as a hero, product card, article card, gallery, avatar, or testimonial. Use relevant, stable Unsplash image URLs from \`https://images.unsplash.com/\` directly in the generated UI, with query parameters such as \`auto=format&fit=crop&w=...&q=80\` for responsive sizing. Use multiple relevant images when the page contains multiple visual cards or sections. Do not use \`source.unsplash.com\`, Unsplash APIs, API keys, image-generation services, or invented URLs. Use image \`alt\` text and preserve an appropriate aspect ratio with \`object-cover\`.
+- Never use web search. Do not open a browser, call a search engine, use a web-search tool, or use terminal commands such as \`curl\`/\`wget\`/\`fetch\` to look up images or content. Select images from known \`images.unsplash.com\` URLs without searching the web. Do not add any web-search dependency or tool.
 - Every screen should include a complete, realistic layout structure (navbar, sidebar, footer, content, etc.) — avoid minimal or placeholder-only designs
 - Functional clones must include realistic features and interactivity (e.g. drag-and-drop, add/edit/delete, toggle states, localStorage if helpful)
 - Prefer minimal, working features over static or hardcoded content
