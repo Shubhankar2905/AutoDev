@@ -45,6 +45,7 @@
     "@trpc/client": "^11.4.2",
     "@trpc/server": "^11.4.2",
     "@trpc/tanstack-react-query": "^11.4.2",
+    "archiver": "^8.0.0",
     "class-variance-authority": "^0.7.1",
     "client-only": "^0.0.1",
     "clsx": "^2.1.1",
@@ -79,6 +80,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/archiver": "^8.0.0",
     "@types/node": "^20",
     "@types/pg": "^8.16.0",
     "@types/prismjs": "^1.26.6",

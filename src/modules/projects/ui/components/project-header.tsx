@@ -7,8 +7,12 @@ import {
   ChevronLeft,
   ChevronLeftIcon,
   EditIcon,
+  DownloadIcon,
+  Loader2Icon,
   SunMoonIcon,
 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { useTRPC } from "@/trpc/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,11 +36,49 @@ interface Props {
 
 export const ProjectHeader = ({ projectId }: Props) => {
   const trpc = useTRPC();
+  const [isDownloading, setIsDownloading] = useState(false);
   const { data: project } = useSuspenseQuery(
     trpc.projects.getOne.queryOptions({ id: projectId }),
   );
 
   const { theme, setTheme } = useTheme();
+
+  const downloadProject = async () => {
+    if (isDownloading) return;
+
+    setIsDownloading(true);
+    try {
+      const response = await fetch(`/api/projects/${projectId}/download`);
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(body?.error || "Unable to download project");
+      }
+
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get("content-disposition");
+      const filename =
+        contentDisposition?.match(/filename="([^"]+)"/i)?.[1] ||
+        `${project.name}.zip`;
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to download project",
+      );
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <header className="p-2 flex justify-between items-center border-b">
@@ -86,6 +128,19 @@ export const ProjectHeader = ({ projectId }: Props) => {
           </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={downloadProject}
+        disabled={isDownloading}
+      >
+        {isDownloading ? (
+          <Loader2Icon className="animate-spin" />
+        ) : (
+          <DownloadIcon />
+        )}
+        {isDownloading ? "Preparing..." : "Download ZIP"}
+      </Button>
     </header>
   );
 };
