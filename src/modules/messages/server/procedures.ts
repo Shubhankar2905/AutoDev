@@ -13,10 +13,11 @@ export const messagesRouter = createTRPCRouter({
         projectId: z.string().min(1, { message: "Project ID is required" }),
       })
     )
-    .query(async({input})=>{
+    .query(async({input, ctx})=>{
       const messages = await prisma.message.findMany({
         where:{
-            projectId : input.projectId
+            projectId : input.projectId,
+            project: { userId: ctx.userId },
         },
         orderBy:{
           updatedAt:"asc",
@@ -34,15 +35,23 @@ export const messagesRouter = createTRPCRouter({
         projectId: z.string().min(1, { message: "Project ID is required" }),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const validation = await validatePrompt(input.value);
       if (!validation.valid) {
         throw new TRPCError({ code: "BAD_REQUEST", message: INVALID_PROMPT_MESSAGE });
       }
 
+      const project = await prisma.project.findFirst({
+        where: { id: input.projectId, userId: ctx.userId },
+        select: { id: true },
+      });
+      if (!project) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
+      }
+
       const createdmessage = await prisma.message.create({
         data: {
-          projectId: input.projectId,
+          projectId: project.id,
           content: input.value,
           role: "USER",
           type: "RESULT",
@@ -59,5 +68,3 @@ export const messagesRouter = createTRPCRouter({
       return createdmessage;
     }),
 });
-
-

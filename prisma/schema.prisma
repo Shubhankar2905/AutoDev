@@ -29,14 +29,17 @@ model Message {
 }
 
 model Fragment {
-  id         String   @id @default(uuid())
-  messageId  String   @unique
-  sandboxUrl String
-  title      String
-  files      Json
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  id            String   @id @default(uuid())
+  messageId     String   @unique
+  sandboxUrl    String
+  sandboxId     String?
+  sandboxStatus String   @default("READY")
+  sandboxError  String?
+  title         String
+  files         Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  message       Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
 
 enum MessageRole {

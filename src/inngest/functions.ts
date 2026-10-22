@@ -1,11 +1,11 @@
 import { inngest } from "./client";
 import { gemini, openai,createAgent, createTool, createNetwork, type Tool, Message, createState } from "@inngest/agent-kit";
-import { Sandbox } from "@e2b/code-interpreter";
 import { getSandboxURL, lastAssistantTextMessageContent, parseAgentResponse } from "./utils";
 import z from "zod";
 import { FRAGMENT_TITLE_PROMPT, PROMPT,RESPONSE_PROMPT } from "@/prompt";
 import { prisma } from "@/lib/prisma";
 import { INVALID_PROMPT_MESSAGE, validatePrompt } from "@/lib/prompt-validator";
+import { createAndRestoreSandbox } from "@/modules/projects/server/sandbox";
 
 interface AgentState {
   summary:string;
@@ -64,7 +64,7 @@ export const codeAgentFunction = inngest.createFunction(
     }
 
     const sandboxId = await step.run("get-sandbox-id", async () => {
-      const sandbox = await Sandbox.create("vibe-nextjs-shubh-2");
+      const sandbox = await createAndRestoreSandbox({});
       return sandbox.sandboxId;
     });
 
@@ -293,6 +293,9 @@ export const codeAgentFunction = inngest.createFunction(
           fragment:{
             create:{
               sandboxUrl:sandboxURL,
+              sandboxId,
+              sandboxStatus:"READY",
+              sandboxError:null,
               title:parseAgentResponse(fragmentTitleOutput),
               files:result.state.data.files,
             }
