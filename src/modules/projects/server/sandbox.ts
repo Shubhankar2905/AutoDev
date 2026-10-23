@@ -1,6 +1,6 @@
 import { Sandbox } from "@e2b/code-interpreter";
 
-const SANDBOX_TEMPLATE = "vibe-nextjs-shubh-2";
+const SANDBOX_TEMPLATE = "vibe-nextjs-shubh-next16-4gb";
 const PREVIEW_PORT = 3000;
 const PREVIEW_READY_TIMEOUT_SECONDS = 90;
 
